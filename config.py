@@ -4,7 +4,7 @@ from datetime import timedelta
 class Config:
     """Application configuration"""
     SECRET_KEY = os.environ.get('SESSION_SECRET') or 'dev-secret-key'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///vitahires.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///vitahires.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # File upload settings

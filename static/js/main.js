@@ -13,6 +13,14 @@ document.addEventListener('scroll', throttle(function() {
     handleNavbarScroll();
     handleScrollAnimations();
 }, 16));
+function handleNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+}
 
 /**
  * Main initialization function

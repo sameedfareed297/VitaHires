@@ -7,6 +7,7 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy.orm import DeclarativeBase
+from config import Config
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +29,7 @@ def create_app():
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     
     # Database configuration
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+    app.config.from_object(Config)
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_recycle": 300,
         "pool_pre_ping": True,
