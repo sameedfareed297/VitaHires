@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
+// Modern enhancements
+document.addEventListener('scroll', throttle(function() {
+    handleNavbarScroll();
+    handleScrollAnimations();
+}, 16));
+
 /**
  * Main initialization function
  */
@@ -32,6 +38,9 @@ function initializeApp() {
     
     // Initialize accessibility features
     initializeAccessibility();
+    
+    // Initialize modern enhancements
+    initializeModernFeatures();
     
     console.log('VitaHires application initialized successfully');
 }
@@ -663,9 +672,270 @@ function initializeLazyLoading() {
     }
 }
 
+/**
+ * Initialize modern features and enhancements
+ */
+function initializeModernFeatures() {
+    // Initialize intersection observer for animations
+    initializeScrollAnimations();
+    
+    // Initialize parallax effects
+    initializeParallaxEffects();
+    
+    // Initialize smooth scrolling for anchor links
+    initializeSmoothScrolling();
+    
+    // Initialize loading states
+    initializeLoadingStates();
+    
+    // Initialize interactive cards
+    initializeInteractiveCards();
+    
+    // Initialize lazy loading
+    initializeLazyLoading();
+}
+
+/**
+ * Handle navbar scroll effects
+ */
+function handleNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    }
+}
+
+/**
+ * Handle scroll-triggered animations
+ */
+function handleScrollAnimations() {
+    const elements = document.querySelectorAll('.slide-up');
+    elements.forEach(function(element) {
+        if (isInViewport(element) && !element.classList.contains('visible')) {
+            element.classList.add('visible');
+        }
+    });
+}
+
+/**
+ * Initialize scroll-triggered animations
+ */
+function initializeScrollAnimations() {
+    // Add slide-up class to elements that should animate on scroll
+    const animatableElements = document.querySelectorAll('.fade-in-up:not(.slide-up)');
+    animatableElements.forEach(function(element) {
+        element.classList.add('slide-up');
+    });
+    
+    // Trigger initial check
+    handleScrollAnimations();
+}
+
+/**
+ * Initialize parallax effects
+ */
+function initializeParallaxEffects() {
+    const parallaxElements = document.querySelectorAll('[data-parallax]');
+    
+    if (parallaxElements.length > 0) {
+        window.addEventListener('scroll', throttle(function() {
+            parallaxElements.forEach(function(element) {
+                const speed = element.dataset.parallax || 0.5;
+                const yPos = -(window.scrollY * speed);
+                element.style.transform = `translateY(${yPos}px)`;
+            });
+        }, 16));
+    }
+}
+
+/**
+ * Initialize smooth scrolling for anchor links
+ */
+function initializeSmoothScrolling() {
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    anchorLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href !== '#' && href.length > 1) {
+                e.preventDefault();
+                scrollToElement(href, 80); // Account for fixed navbar
+            }
+        });
+    });
+}
+
+/**
+ * Initialize loading states for buttons
+ */
+function initializeLoadingStates() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function() {
+            const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitBtn && !submitBtn.classList.contains('loading')) {
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+                
+                // Remove loading state after form submission completes or fails
+                setTimeout(function() {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        });
+    });
+}
+
+/**
+ * Initialize interactive card effects
+ */
+function initializeInteractiveCards() {
+    const cards = document.querySelectorAll('.card, .job-card');
+    cards.forEach(function(card) {
+        if (!card.classList.contains('interactive-card')) {
+            card.classList.add('interactive-card');
+        }
+        
+        // Add click handler for cards with links
+        const cardLink = card.querySelector('a[href]:not(.btn)');
+        if (cardLink) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.btn') && !e.target.closest('button')) {
+                    cardLink.click();
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Enhanced notification with better positioning and animations
+ */
+function showEnhancedNotification(message, type = 'info', duration = 5000) {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.enhanced-notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `enhanced-notification alert alert-${type} shadow-lg fade-in-up`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 320px;
+        max-width: 400px;
+        border: none;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    `;
+    
+    const icon = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    }[type] || 'fas fa-info-circle';
+    
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="${icon} me-3"></i>
+            <div class="flex-grow-1">${message}</div>
+            <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after duration
+    setTimeout(function() {
+        if (notification.parentNode) {
+            notification.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, duration);
+}
+
+/**
+ * Initialize keyboard shortcuts
+ */
+function initializeKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('#global-search, input[name="keywords"]');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        }
+        
+        // Escape to close modals and notifications
+        if (e.key === 'Escape') {
+            const notifications = document.querySelectorAll('.enhanced-notification');
+            notifications.forEach(notification => notification.remove());
+        }
+    });
+}
+
+/**
+ * Performance monitoring
+ */
+function initializePerformanceMonitoring() {
+    // Monitor page load performance
+    if ('performance' in window) {
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const perfData = performance.timing;
+                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                const domReadyTime = perfData.domContentLoadedEventEnd - perfData.navigationStart;
+                
+                console.log('Page Performance:', {
+                    'Total Load Time': pageLoadTime + 'ms',
+                    'DOM Ready Time': domReadyTime + 'ms'
+                });
+                
+                // Report slow loading (optional analytics integration point)
+                if (pageLoadTime > 3000) {
+                    console.warn('Slow page load detected:', pageLoadTime + 'ms');
+                }
+            }, 0);
+        });
+    }
+}
+
+// Add CSS animations for notifications
+if (!document.querySelector('#enhanced-notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'enhanced-notification-styles';
+    style.textContent = `
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .enhanced-notification {
+            animation: fadeInUp 0.4s ease-out;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Initialize performance monitoring
+initializePerformanceMonitoring();
+
+// Initialize keyboard shortcuts
+initializeKeyboardShortcuts();
+
 // Export functions for testing or external use
 window.VitaHires = {
     showNotification,
+    showEnhancedNotification,
     copyToClipboard,
     formatDate,
     timeAgo,

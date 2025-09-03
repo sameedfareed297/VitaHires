@@ -7,25 +7,25 @@
 <section class="hero-section bg-gradient-primary text-white">
     <div class="container">
         <div class="row min-vh-100 align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold mb-4">
+            <div class="col-lg-6 hero-content">
+                <h1 class="display-4 fw-bold mb-4 hero-title fade-in-up">
                     Connecting Talent with Opportunity
                 </h1>
-                <p class="lead mb-4">
+                <p class="lead mb-4 fade-in-up" style="animation-delay: 0.2s;">
                     VitaHires bridges the gap between exceptional talent and forward-thinking employers. 
                     Find your next career opportunity or discover the perfect candidate for your team.
                 </p>
-                <div class="d-flex gap-3 mb-4">
-                    <a href="{{ url_for('jobs.list_jobs') }}" class="btn btn-accent btn-lg">
+                <div class="d-flex gap-3 mb-4 fade-in-up" style="animation-delay: 0.4s;">
+                    <a href="{{ url_for('jobs.list_jobs') }}" class="btn btn-accent btn-lg pulse">
                         <i class="fas fa-search me-2"></i>Find a Job
                     </a>
-                    <a href="{{ url_for('jobs.post_job') }}" class="btn btn-outline-light btn-lg">
+                    <a href="{{ url_for('jobs.post_job') }}" class="btn btn-glass btn-lg">
                         <i class="fas fa-plus me-2"></i>Hire Talent
                     </a>
                 </div>
                 
                 <!-- Stats -->
-                <div class="row text-center mt-5">
+                <div class="row text-center mt-5 stats-section fade-in-up" style="animation-delay: 0.6s;">
                     <div class="col-4">
                         <h3 class="fw-bold">{{ total_jobs }}+</h3>
                         <small>Active Jobs</small>
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 text-center">
+            <div class="col-lg-6 text-center fade-in-up" style="animation-delay: 0.8s;">
                 <div class="hero-image">
                     <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <!-- Professional team illustration -->
@@ -242,7 +242,7 @@
         
         <div class="row">
             <div class="col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm fade-in-up" style="animation-delay: 0.2s;">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
                             <i class="fas fa-quote-left fa-2x text-primary"></i>
@@ -260,7 +260,7 @@
             </div>
             
             <div class="col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm fade-in-up" style="animation-delay: 0.4s;">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
                             <i class="fas fa-quote-left fa-2x text-primary"></i>
@@ -278,7 +278,7 @@
             </div>
             
             <div class="col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm fade-in-up" style="animation-delay: 0.6s;">
                     <div class="card-body text-center p-4">
                         <div class="mb-3">
                             <i class="fas fa-quote-left fa-2x text-primary"></i>
