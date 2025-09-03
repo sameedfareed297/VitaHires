@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - VitaHires Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Back to Blog Link -->
+            <div class="mb-4">
+                <a href="{{ url_for('main.blog_list') }}" class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Blog
+                </a>
+            </div>
+
+            <!-- Article Header -->
+            <article class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <!-- Category Badge -->
+                    {% if post.category %}
+                    <span class="badge bg-primary fs-6 mb-3">{{ post.category.title() }}</span>
+                    {% endif %}
+                    
+                    <!-- Article Title -->
+                    <h1 class="display-5 fw-bold mb-4">{{ post.title }}</h1>
+                    
+                    <!-- Article Meta -->
+                    <div class="article-meta mb-4 pb-4 border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="author-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">
+                                            {% if post.author %}
+                                                {% if post.author.user_type == 'admin' %}VitaHires Team
+                                                {% elif post.author.jobseeker_profile %}{{ post.author.jobseeker_profile.full_name }}
+                                                {% elif post.author.employer_profile %}{{ post.author.employer_profile.contact_person }}
+                                                {% else %}{{ post.author.email }}
+                                                {% endif %}
+                                            {% else %}VitaHires Team
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">Author</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                <div class="text-muted">
+                                    <div class="mb-1">
+                                        <i class="fas fa-calendar me-2"></i>
+                                        {{ post.published_at.strftime('%B %d, %Y') if post.published_at else post.created_at.strftime('%B %d, %Y') }}
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-clock me-2"></i>
+                                        {% set word_count = post.content.split()|length %}
+                                        {% set read_time = (word_count / 200)|round|int %}
+                                        {{ read_time if read_time > 0 else 1 }} min read
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Article Content -->
+                    <div class="article-content">
+                        {{ post.content|replace('\n', '<br>')|safe }}
+                    </div>
+                    
+                    <!-- Article Footer -->
+                    <div class="article-footer mt-5 pt-4 border-top">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold mb-2">Share this article</h6>
+                                <div class="social-share d-flex gap-2">
+                                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" 
+                                       target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin me-1"></i>LinkedIn
+                                    </a>
+                                    <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ post.title }}" 
+                                       target="_blank" class="btn btn-outline-info btn-sm">
+                                        <i class="fab fa-twitter me-1"></i>Twitter
+                                    </a>
+                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" 
+                                       target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-facebook me-1"></i>Facebook
+                                    </a>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="copyToClipboard()">
+                                        <i class="fas fa-copy me-1"></i>Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                <div class="article-tags">
+                                    {% if post.category %}
+                                    <span class="badge bg-light text-dark me-1">#{{ post.category }}</span>
+                                    {% endif %}
+                                    <span class="badge bg-light text-dark me-1">#career</span>
+                                    <span class="badge bg-light text-dark me-1">#vitahires</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Call to Action -->
+            <div class="card border-0 shadow-sm mt-4 bg-gradient-primary text-white">
+                <div class="card-body p-4 text-center">
+                    <h5 class="fw-bold mb-3">Ready to Take the Next Step in Your Career?</h5>
+                    <p class="mb-3 opacity-75">
+                        Join thousands of professionals who trust VitaHires to find their perfect job match.
+                    </p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{{ url_for('jobs.list_jobs') }}" class="btn btn-accent">
+                            <i class="fas fa-search me-2"></i>Browse Jobs
+                        </a>
+                        <a href="{{ url_for('auth.register_jobseeker') }}" class="btn btn-outline-light">
+                            <i class="fas fa-user-plus me-2"></i>Create Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Articles -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">You Might Also Like</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="related-article">
+                                <h6 class="fw-bold mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        How to Write a Compelling Resume
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>March 15, 2024
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="related-article">
+                                <h6 class="fw-bold mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        Top Tech Skills in 2024
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>March 10, 2024
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="related-article">
+                                <h6 class="fw-bold mb-2">
+                                    <a href="#" class="text-decoration-none">
+                                        Interview Preparation Guide
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>March 05, 2024
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+                <!-- Newsletter Signup -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">Stay Updated</h6>
+                        <p class="text-muted small mb-3">
+                            Get the latest career insights and job opportunities delivered to your inbox.
+                        </p>
+                        <form>
+                            <div class="input-group mb-3">
+                                <input type="email" class="form-control" placeholder="Your email">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            We respect your privacy. Unsubscribe anytime.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Popular Posts -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-4">Popular Posts</h6>
+                        <div class="popular-posts">
+                            <div class="popular-post mb-3 pb-3 border-bottom">
+                                <h6 class="mb-1">
+                                    <a href="#" class="text-decoration-none">
+                                        Remote Work Best Practices
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>1.2k views
+                                </small>
+                            </div>
+                            <div class="popular-post mb-3 pb-3 border-bottom">
+                                <h6 class="mb-1">
+                                    <a href="#" class="text-decoration-none">
+                                        Salary Negotiation Tips
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>950 views
+                                </small>
+                            </div>
+                            <div class="popular-post">
+                                <h6 class="mb-1">
+                                    <a href="#" class="text-decoration-none">
+                                        Building a Strong Portfolio
+                                    </a>
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-eye me-1"></i>780 views
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Article link copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

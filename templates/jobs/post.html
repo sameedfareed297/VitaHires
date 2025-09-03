@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job - VitaHires{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">Post a New Job</h2>
+                        <p class="text-muted">Find exceptional talent for your team</p>
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Job Title -->
+                        <div class="mb-4">
+                            {{ form.title.label(class="form-label fw-bold") }}
+                            {{ form.title(class="form-control form-control-lg") }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.title.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Job Details Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.category.label(class="form-label fw-bold") }}
+                                {{ form.category(class="form-select") }}
+                                {% if form.category.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.category.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.job_type.label(class="form-label fw-bold") }}
+                                {{ form.job_type(class="form-select") }}
+                                {% if form.job_type.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.job_type.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Location and Experience -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.location.label(class="form-label fw-bold") }}
+                                {{ form.location(class="form-control", placeholder="City, State or Remote") }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.location.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.experience_level.label(class="form-label fw-bold") }}
+                                {{ form.experience_level(class="form-select") }}
+                                {% if form.experience_level.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.experience_level.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Salary Range -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.salary_min.label(class="form-label fw-bold") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.salary_min(class="form-control", placeholder="50000") }}
+                                </div>
+                                {% if form.salary_min.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.salary_min.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.salary_max.label(class="form-label fw-bold") }}
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    {{ form.salary_max(class="form-control", placeholder="80000") }}
+                                </div>
+                                {% if form.salary_max.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.salary_max.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="mb-4">
+                            {{ form.description.label(class="form-label fw-bold") }}
+                            {{ form.description(class="form-control", rows="8", placeholder="Describe the role, responsibilities, and what makes this opportunity unique...") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="mb-4">
+                            {{ form.requirements.label(class="form-label fw-bold") }}
+                            {{ form.requirements(class="form-control", rows="6", placeholder="List the required qualifications, experience, and education...") }}
+                            {% if form.requirements.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.requirements.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="mb-4">
+                            {{ form.skills_required.label(class="form-label fw-bold") }}
+                            {{ form.skills_required(class="form-control", rows="3", placeholder="Python, JavaScript, React, SQL, AWS (comma-separated)") }}
+                            <div class="form-text">Enter skills separated by commas</div>
+                            {% if form.skills_required.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.skills_required.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Application Deadline -->
+                        <div class="mb-4">
+                            {{ form.expires_at.label(class="form-label fw-bold") }}
+                            {{ form.expires_at(class="form-control") }}
+                            <div class="form-text">Optional: Set a deadline for applications</div>
+                            {% if form.expires_at.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.expires_at.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus me-2"></i>Post Job
+                            </button>
+                            <a href="{{ url_for('dashboard.employer') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

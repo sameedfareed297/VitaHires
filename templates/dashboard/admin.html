@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - VitaHires{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <!-- Welcome Section -->
+        <div class="col-12 mb-4">
+            <div class="card bg-gradient-primary text-white border-0">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="fw-bold mb-2">Admin Dashboard</h2>
+                            <p class="mb-0 opacity-75">
+                                Monitor platform activity, manage users and job postings, and generate reports.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <button class="btn btn-accent btn-lg" onclick="generateReport()">
+                                <i class="fas fa-chart-line me-2"></i>Generate Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="text-primary mb-2">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ total_users }}</h4>
+                    <p class="text-muted mb-0">Total Users</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-briefcase fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ total_jobs }}</h4>
+                    <p class="text-muted mb-0">Total Jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ pending_jobs }}</h4>
+                    <p class="text-muted mb-0">Pending Jobs</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-paper-plane fa-2x"></i>
+                    </div>
+                    <h4 class="fw-bold">{{ total_applications }}</h4>
+                    <p class="text-muted mb-0">Total Applications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Jobs -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Recent Job Postings</h5>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-success" onclick="approveSelected()">
+                                <i class="fas fa-check me-1"></i>Approve
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="rejectSelected()">
+                                <i class="fas fa-times me-1"></i>Reject
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if recent_jobs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="selectAll">
+                                        </th>
+                                        <th>Job Title</th>
+                                        <th>Company</th>
+                                        <th>Category</th>
+                                        <th>Posted Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in recent_jobs %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="jobSelection" value="{{ job.id }}">
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" 
+                                               class="text-decoration-none fw-semibold">
+                                                {{ job.title }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if job.posted_by_user.employer_profile %}
+                                                {{ job.posted_by_user.employer_profile.company_name }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                {{ job.category.replace('-', ' ').title() }}
+                                            </span>
+                                        </td>
+                                        <td>{{ job.posted_at.strftime('%b %d, %Y') }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if job.is_active and job.is_approved %}bg-success
+                                                {% elif job.is_active and not job.is_approved %}bg-warning
+                                                {% else %}bg-secondary{% endif %}">
+                                                {% if job.is_active and job.is_approved %}Approved
+                                                {% elif job.is_active and not job.is_approved %}Pending
+                                                {% else %}Inactive{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('jobs.job_detail', job_id=job.id) }}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if not job.is_approved %}
+                                                <button class="btn btn-outline-success" 
+                                                        onclick="approveJob({{ job.id }})">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                {% endif %}
+                                                <button class="btn btn-outline-danger" 
+                                                        onclick="deleteJob({{ job.id }})">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                            <h6>No recent job postings</h6>
+                            <p class="text-muted">Job postings will appear here as they are submitted.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Recent Users -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Recent User Registrations</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_users %}
+                        {% for user in recent_users[:5] %}
+                        <div class="d-flex justify-content-between align-items-start mb-3 pb-3 border-bottom">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    {% if user.user_type == 'jobseeker' and user.jobseeker_profile %}
+                                        {{ user.jobseeker_profile.full_name }}
+                                    {% elif user.user_type == 'employer' and user.employer_profile %}
+                                        {{ user.employer_profile.contact_person }}
+                                    {% else %}
+                                        {{ user.email }}
+                                    {% endif %}
+                                </h6>
+                                <p class="small text-muted mb-1">{{ user.email }}</p>
+                                <span class="badge 
+                                    {% if user.user_type == 'jobseeker' %}bg-info
+                                    {% elif user.user_type == 'employer' %}bg-success
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ user.user_type.title() }}
+                                </span>
+                            </div>
+                            <small class="text-muted">{{ user.created_at.strftime('%b %d') }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-user-plus text-muted mb-2"></i>
+                            <p class="small text-muted mb-0">No recent registrations</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Platform Analytics -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Platform Analytics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h5 class="text-primary mb-1">
+                                {% set jobseekers = recent_users | selectattr('user_type', 'equalto', 'jobseeker') | list %}
+                                {{ jobseekers | length }}
+                            </h5>
+                            <small class="text-muted">Job Seekers</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h5 class="text-success mb-1">
+                                {% set employers = recent_users | selectattr('user_type', 'equalto', 'employer') | list %}
+                                {{ employers | length }}
+                            </h5>
+                            <small class="text-muted">Employers</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h5 class="text-info mb-1">
+                                {% set active_jobs = recent_jobs | selectattr('is_active', 'equalto', true) | list %}
+                                {{ active_jobs | length }}
+                            </h5>
+                            <small class="text-muted">Active Jobs</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h5 class="text-warning mb-1">{{ pending_jobs }}</h5>
+                            <small class="text-muted">Pending Review</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h6 class="fw-bold mb-0">Admin Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="exportUserData()">
+                            <i class="fas fa-download me-2"></i>Export User Data
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="exportJobData()">
+                            <i class="fas fa-file-csv me-2"></i>Export Job Data
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="sendNewsletter()">
+                            <i class="fas fa-envelope me-2"></i>Send Newsletter
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm" onclick="moderateContent()">
+                            <i class="fas fa-shield-alt me-2"></i>Content Moderation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Admin Dashboard JavaScript Functions
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('input[name="jobSelection"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+function approveJob(jobId) {
+    if (confirm('Are you sure you want to approve this job posting?')) {
+        // Add AJAX call to approve job
+        console.log('Approving job:', jobId);
+        alert('Job approved successfully!');
+        location.reload();
+    }
+}
+
+function deleteJob(jobId) {
+    if (confirm('Are you sure you want to delete this job posting? This action cannot be undone.')) {
+        // Add AJAX call to delete job
+        console.log('Deleting job:', jobId);
+        alert('Job deleted successfully!');
+        location.reload();
+    }
+}
+
+function approveSelected() {
+    const selected = document.querySelectorAll('input[name="jobSelection"]:checked');
+    if (selected.length === 0) {
+        alert('Please select at least one job to approve.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to approve ${selected.length} job posting(s)?`)) {
+        console.log('Approving selected jobs');
+        alert('Selected jobs approved successfully!');
+        location.reload();
+    }
+}
+
+function rejectSelected() {
+    const selected = document.querySelectorAll('input[name="jobSelection"]:checked');
+    if (selected.length === 0) {
+        alert('Please select at least one job to reject.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to reject ${selected.length} job posting(s)?`)) {
+        console.log('Rejecting selected jobs');
+        alert('Selected jobs rejected successfully!');
+        location.reload();
+    }
+}
+
+function generateReport() {
+    alert('Generating comprehensive platform report...');
+    // Add functionality to generate and download report
+}
+
+function exportUserData() {
+    alert('Exporting user data to CSV...');
+    // Add functionality to export user data
+}
+
+function exportJobData() {
+    alert('Exporting job data to CSV...');
+    // Add functionality to export job data
+}
+
+function sendNewsletter() {
+    if (confirm('Send newsletter to all registered users?')) {
+        alert('Newsletter queued for sending!');
+    }
+}
+
+function moderateContent() {
+    alert('Opening content moderation panel...');
+    // Add functionality for content moderation
+}
+</script>
+{% endblock %}

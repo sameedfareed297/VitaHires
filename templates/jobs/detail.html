@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - VitaHires{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Job Header -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-primary me-2">{{ job.category.replace('-', ' ').title() }}</span>
+                            <span class="badge bg-secondary">{{ job.job_type.title() }}</span>
+                            {% if job.experience_level %}
+                                <span class="badge bg-info">{{ job.experience_level.title() }} Level</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Posted {{ job.posted_at.strftime('%b %d, %Y') }}</small>
+                    </div>
+                    
+                    <h1 class="display-6 fw-bold text-primary mb-3">{{ job.title }}</h1>
+                    
+                    <h5 class="text-muted mb-3">
+                        {% if job.posted_by_user.employer_profile %}
+                            <i class="fas fa-building me-2"></i>{{ job.posted_by_user.employer_profile.company_name }}
+                        {% endif %}
+                    </h5>
+                    
+                    <div class="row text-muted mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <i class="fas fa-map-marker-alt me-2"></i>{{ job.location or 'Remote' }}
+                            </p>
+                        </div>
+                        {% if job.salary_min or job.salary_max %}
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                {% if job.salary_min and job.salary_max %}
+                                    ${{ "{:,}".format(job.salary_min) }} - ${{ "{:,}".format(job.salary_max) }}
+                                {% elif job.salary_min %}
+                                    ${{ "{:,}".format(job.salary_min) }}+
+                                {% elif job.salary_max %}
+                                    Up to ${{ "{:,}".format(job.salary_max) }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if job.expires_at %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-clock me-2"></i>
+                        Application deadline: {{ job.expires_at.strftime('%B %d, %Y') }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Job Description</h4>
+                    <div class="job-description">
+                        {{ job.description | replace('\n', '<br>') | safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requirements -->
+            {% if job.requirements %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Requirements</h4>
+                    <div class="job-requirements">
+                        {{ job.requirements | replace('\n', '<br>') | safe }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Skills -->
+            {% if job.skills_required %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-3">Required Skills</h4>
+                    <div class="skills-tags">
+                        {% for skill in job.skills_required.split(',') %}
+                            <span class="badge bg-light text-dark me-2 mb-2 p-2">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Application Actions -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    {% if current_user.is_authenticated and current_user.user_type == 'jobseeker' %}
+                        {% if has_applied %}
+                            <div class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                You have already applied for this position.
+                            </div>
+                        {% else %}
+                            <form method="POST" action="{{ url_for('jobs.apply_job', job_id=job.id) }}">
+                                {{ csrf_token() }}
+                                <div class="mb-3">
+                                    <label for="cover_letter" class="form-label">Cover Letter (Optional)</label>
+                                    <textarea name="cover_letter" id="cover_letter" class="form-control" rows="4" 
+                                              placeholder="Tell the employer why you're a great fit for this role..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                    <i class="fas fa-paper-plane me-2"></i>Apply Now
+                                </button>
+                            </form>
+                        {% endif %}
+                        
+                        <form method="POST" action="{{ url_for('jobs.save_job', job_id=job.id) }}">
+                            {{ csrf_token() }}
+                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-bookmark me-2"></i>
+                                {% if is_saved %}Remove from Saved{% else %}Save Job{% endif %}
+                            </button>
+                        </form>
+                    {% elif current_user.is_authenticated and current_user.user_type == 'employer' %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Only job seekers can apply for positions.
+                        </div>
+                    {% else %}
+                        <div class="text-center">
+                            <p class="text-muted mb-3">Ready to apply?</p>
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to Apply
+                            </a>
+                            <a href="{{ url_for('auth.register_jobseeker') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Company Info -->
+            {% if job.posted_by_user.employer_profile %}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">About the Company</h5>
+                    <h6 class="text-primary">{{ job.posted_by_user.employer_profile.company_name }}</h6>
+                    
+                    {% if job.posted_by_user.employer_profile.company_description %}
+                        <p class="text-muted">{{ job.posted_by_user.employer_profile.company_description[:200] }}...</p>
+                    {% endif %}
+                    
+                    <div class="company-details">
+                        {% if job.posted_by_user.employer_profile.industry %}
+                        <p class="small mb-1">
+                            <strong>Industry:</strong> {{ job.posted_by_user.employer_profile.industry }}
+                        </p>
+                        {% endif %}
+                        
+                        {% if job.posted_by_user.employer_profile.company_size %}
+                        <p class="small mb-1">
+                            <strong>Company Size:</strong> {{ job.posted_by_user.employer_profile.company_size }}
+                        </p>
+                        {% endif %}
+                        
+                        {% if job.posted_by_user.employer_profile.location %}
+                        <p class="small mb-1">
+                            <strong>Location:</strong> {{ job.posted_by_user.employer_profile.location }}
+                        </p>
+                        {% endif %}
+                        
+                        {% if job.posted_by_user.employer_profile.website %}
+                        <p class="small mb-0">
+                            <strong>Website:</strong> 
+                            <a href="{{ job.posted_by_user.employer_profile.website }}" target="_blank" class="text-decoration-none">
+                                Visit Company Site <i class="fas fa-external-link-alt ms-1"></i>
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Share -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3">Share this Job</h6>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url }}" 
+                           target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="fab fa-linkedin me-1"></i>LinkedIn
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ job.title }}" 
+                           target="_blank" class="btn btn-outline-info btn-sm">
+                            <i class="fab fa-twitter me-1"></i>Twitter
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="copyToClipboard()">
+                            <i class="fas fa-copy me-1"></i>Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Job link copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

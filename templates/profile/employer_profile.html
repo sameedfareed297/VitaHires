@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Company Profile - VitaHires{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">Company Profile</h2>
+                        <p class="text-muted">Complete your company profile to attract top talent</p>
+                        {% if profile and profile.is_verified %}
+                            <span class="badge bg-success fs-6">
+                                <i class="fas fa-check-circle me-1"></i>Verified Company
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning fs-6">
+                                <i class="fas fa-clock me-1"></i>Pending Verification
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Company Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                {{ form.company_name.label(class="form-label fw-bold") }}
+                                {{ form.company_name(class="form-control") }}
+                                {% if form.company_name.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.company_name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.company_size.label(class="form-label fw-bold") }}
+                                {{ form.company_size(class="form-select") }}
+                                {% if form.company_size.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.company_size.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Industry and Location -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.industry.label(class="form-label fw-bold") }}
+                                {{ form.industry(class="form-control", placeholder="Technology, Healthcare, Finance...") }}
+                                {% if form.industry.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.industry.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.location.label(class="form-label fw-bold") }}
+                                {{ form.location(class="form-control", placeholder="City, State") }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.location.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Company Description -->
+                        <div class="mb-4">
+                            {{ form.company_description.label(class="form-label fw-bold") }}
+                            {{ form.company_description(class="form-control", rows="6", 
+                                placeholder="Describe your company's mission, values, culture, and what makes it a great place to work...") }}
+                            <div class="form-text">This description will be shown to job seekers on your job postings</div>
+                            {% if form.company_description.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.company_description.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Website -->
+                        <div class="mb-4">
+                            {{ form.website.label(class="form-label fw-bold") }}
+                            {{ form.website(class="form-control", placeholder="https://www.yourcompany.com") }}
+                            {% if form.website.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.website.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.contact_person.label(class="form-label fw-bold") }}
+                                {{ form.contact_person(class="form-control") }}
+                                {% if form.contact_person.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.contact_person.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control") }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.phone.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Company Profile
+                            </button>
+                            <a href="{{ url_for('dashboard.employer') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Company Profile Benefits -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-star text-warning me-2"></i>Complete Profile Benefits
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Attract more qualified candidates
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Build trust with job seekers
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Improve job posting visibility
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Showcase company culture
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Get verified company status
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Stand out from competitors
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verification Process -->
+            {% if not profile or not profile.is_verified %}
+            <div class="card mt-4 border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-shield-alt text-primary me-2"></i>Company Verification
+                    </h5>
+                    <p class="text-muted mb-3">
+                        Get your company verified to build trust with job seekers and improve your hiring success rate.
+                    </p>
+                    <div class="verification-steps">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="verification-step">
+                                    <i class="fas fa-edit fa-2x text-primary mb-2"></i>
+                                    <h6>Complete Profile</h6>
+                                    <small class="text-muted">Fill out all company information</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="verification-step">
+                                    <i class="fas fa-envelope fa-2x text-primary mb-2"></i>
+                                    <h6>Submit Request</h6>
+                                    <small class="text-muted">Contact our team for verification</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mb-3">
+                                <div class="verification-step">
+                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <h6>Get Verified</h6>
+                                    <small class="text-muted">Receive verified status</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('main.contact') }}" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Request Verification
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

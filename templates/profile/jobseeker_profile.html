@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - VitaHires{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-primary">My Profile</h2>
+                        <p class="text-muted">Complete your profile to attract top employers</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Personal Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.first_name.label(class="form-label fw-bold") }}
+                                {{ form.first_name(class="form-control") }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.first_name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name.label(class="form-label fw-bold") }}
+                                {{ form.last_name(class="form-control") }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.last_name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control") }}
+                                {% if form.phone.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.phone.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.location.label(class="form-label fw-bold") }}
+                                {{ form.location(class="form-control", placeholder="City, State") }}
+                                {% if form.location.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.location.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Professional Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.experience_years.label(class="form-label fw-bold") }}
+                                {{ form.experience_years(class="form-control") }}
+                                {% if form.experience_years.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.experience_years.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Job Alerts</label>
+                                <div class="form-check form-switch">
+                                    {{ form.job_alerts(class="form-check-input") }}
+                                    <label class="form-check-label" for="{{ form.job_alerts.id }}">
+                                        Receive email notifications for new job opportunities
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="mb-4">
+                            {{ form.skills.label(class="form-label fw-bold") }}
+                            {{ form.skills(class="form-control", rows="3", placeholder="Python, JavaScript, React, SQL, AWS (comma-separated)") }}
+                            <div class="form-text">Enter your technical skills separated by commas</div>
+                            {% if form.skills.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.skills.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="mb-4">
+                            {{ form.bio.label(class="form-label fw-bold") }}
+                            {{ form.bio(class="form-control", rows="5", placeholder="Tell employers about your professional background, achievements, and career goals...") }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.bio.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Professional Links -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                {{ form.linkedin_url.label(class="form-label fw-bold") }}
+                                {{ form.linkedin_url(class="form-control", placeholder="https://linkedin.com/in/yourprofile") }}
+                                {% if form.linkedin_url.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.linkedin_url.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.portfolio_url.label(class="form-label fw-bold") }}
+                                {{ form.portfolio_url(class="form-control", placeholder="https://yourportfolio.com") }}
+                                {% if form.portfolio_url.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.portfolio_url.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Resume Upload -->
+                        <div class="mb-4">
+                            {{ form.resume.label(class="form-label fw-bold") }}
+                            {% if profile and profile.resume_filename %}
+                                <div class="alert alert-info mb-2">
+                                    <i class="fas fa-file-pdf me-2"></i>
+                                    Current resume: <strong>{{ profile.resume_filename }}</strong>
+                                    <a href="{{ url_for('main.uploaded_file', filename=profile.resume_filename) }}" 
+                                       target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {{ form.resume(class="form-control") }}
+                            <div class="form-text">Upload your resume in PDF, DOC, or DOCX format (max 16MB)</div>
+                            {% if form.resume.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.resume.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Profile
+                            </button>
+                            <a href="{{ url_for('dashboard.jobseeker') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Profile Tips -->
+            <div class="card mt-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>Profile Tips
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Use a professional profile photo
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Write a compelling bio highlighting your strengths
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    List relevant technical skills
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Upload an updated resume
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Include links to your portfolio or LinkedIn
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Enable job alerts to stay updated
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
